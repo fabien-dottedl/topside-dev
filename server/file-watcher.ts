@@ -34,7 +34,10 @@ export function createFileWatcher(
   onChangeCallback: (event: FileChangeEvent) => void
 ) {
   const watcher = watch(streamsDir, {
-    ignored: /(^|[/\\])\.|node_modules/,
+    ignored: (filePath: string) => {
+      const base = path.basename(filePath);
+      return base.startsWith(".") || base === "node_modules";
+    },
     persistent: true,
     ignoreInitial: true,
     awaitWriteFinish: {
@@ -44,6 +47,7 @@ export function createFileWatcher(
 
   const handle = (eventName: "add" | "change" | "unlink", filePath: string) => {
     const relativePath = path.relative(streamsDir, filePath);
+    console.log(`[file-watcher] ${eventName}: ${relativePath} (${categorize(relativePath)})`);
     onChangeCallback({
       type: "file-change",
       event: eventName,
@@ -51,6 +55,10 @@ export function createFileWatcher(
       category: categorize(relativePath),
     });
   };
+
+  watcher.on("ready", () => {
+    console.log(`[file-watcher] Watching ${streamsDir} for changes`);
+  });
 
   watcher.on("add", (p) => handle("add", p));
   watcher.on("change", (p) => handle("change", p));

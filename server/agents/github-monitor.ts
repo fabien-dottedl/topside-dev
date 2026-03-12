@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
-import { groq } from "@ai-sdk/groq";
+import { anthropic } from "@ai-sdk/anthropic";
 import { readNotifications, markNotificationRead } from "./tools/github.js";
 import { getCurrentTime } from "./tools/shared.js";
 
@@ -41,7 +41,7 @@ Triage guidance:
 - Releases = informational
 
 Note: In V0, you can only read from the local notifications cache. Live GitHub API access will come in a future version.`,
-  model: groq("llama-4-scout-17b-16e-instruct"),
+  model: anthropic("claude-haiku-4-5-20251001"),
   tools: {
     readNotifications,
     markNotificationRead,

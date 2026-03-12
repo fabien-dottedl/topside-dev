@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
-import { groq } from "@ai-sdk/groq";
+import { anthropic } from "@ai-sdk/anthropic";
 import {
   listIdeas,
   readIdea,
@@ -62,7 +62,7 @@ When reviewing ideas:
 - List all ideas with their status and priority
 - Help evaluate which ideas are ready to become streams
 - Suggest archiving stale ideas`,
-  model: groq("llama-3.3-70b-versatile"),
+  model: anthropic("claude-haiku-4-5-20251001"),
   tools: {
     listIdeas,
     readIdea,

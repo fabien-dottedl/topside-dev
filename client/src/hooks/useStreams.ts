@@ -23,5 +23,15 @@ export function useStreams() {
     fetch();
   }, [fetch]);
 
-  return { active, completed, loading, refetch: fetch };
+  const completeStream = useCallback(async (id: string) => {
+    await api.completeStream(id);
+    await fetch();
+  }, [fetch]);
+
+  const deleteStream = useCallback(async (id: string) => {
+    await api.deleteStream(id);
+    await fetch();
+  }, [fetch]);
+
+  return { active, completed, loading, refetch: fetch, completeStream, deleteStream };
 }

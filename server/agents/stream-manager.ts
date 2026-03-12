@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
-import { groq } from "@ai-sdk/groq";
+import { anthropic } from "@ai-sdk/anthropic";
 import {
   listStreams,
   getStream,
@@ -57,7 +57,7 @@ When updating streams:
 - Use notes.md for observations that don't fit in scope
 
 Provide clear, concise summaries when listing streams.`,
-  model: groq("llama-3.3-70b-versatile"),
+  model: anthropic("claude-haiku-4-5-20251001"),
   tools: {
     listStreams,
     getStream,

@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
-import { groq } from "@ai-sdk/groq";
+import { anthropic } from "@ai-sdk/anthropic";
 import {
   readDayPlan,
   writeDayPlan,
@@ -55,7 +55,7 @@ Format for day plans:
 \`\`\`
 
 At the end of the day, offer to archive the plan before creating a new one.`,
-  model: groq("llama-3.3-70b-versatile"),
+  model: anthropic("claude-haiku-4-5-20251001"),
   tools: {
     readDayPlan,
     writeDayPlan,

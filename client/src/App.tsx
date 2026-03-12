@@ -10,18 +10,21 @@ import { useStreams } from "./hooks/useStreams";
 import { useStreamDetail } from "./hooks/useStreamDetail";
 import { useDayPlan } from "./hooks/useDayPlan";
 import { useIdeas } from "./hooks/useIdeas";
+import { useNotes } from "./hooks/useNotes";
 import { useGitHub } from "./hooks/useGitHub";
-import { ChatDrawer } from "./components/ChatDrawer";
+import { ChatSidebar } from "./components/ChatSidebar";
 import { useFileWatcher } from "./hooks/useWebSocket";
 import type { FileChangeEvent } from "./types";
 
 export default function App() {
   const [selectedStreamId, setSelectedStreamId] = useState<string | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const streams = useStreams();
   const streamDetail = useStreamDetail(selectedStreamId);
   const dayPlan = useDayPlan();
   const ideas = useIdeas();
+  const notes = useNotes();
   const github = useGitHub();
 
   // Keep refetch functions in refs so callbacks remain stable
@@ -30,6 +33,7 @@ export default function App() {
     streamDetail: streamDetail.refetch,
     dayPlan: dayPlan.refetch,
     ideas: ideas.refetch,
+    notes: notes.refetch,
     github: github.refetch,
   });
   refetchRefs.current = {
@@ -37,6 +41,7 @@ export default function App() {
     streamDetail: streamDetail.refetch,
     dayPlan: dayPlan.refetch,
     ideas: ideas.refetch,
+    notes: notes.refetch,
     github: github.refetch,
   };
 
@@ -55,6 +60,7 @@ export default function App() {
     r.streamDetail();
     r.dayPlan();
     r.ideas();
+    r.notes();
     r.github();
   }, []);
 
@@ -78,10 +84,7 @@ export default function App() {
           debouncedRefetch("github", r.github);
           break;
         case "notes":
-          debouncedRefetch("notes", () => {
-            r.ideas();
-            r.streamDetail();
-          });
+          debouncedRefetch("notes", r.notes);
           break;
       }
     },
@@ -108,6 +111,8 @@ export default function App() {
               completed={streams.completed}
               selectedId={selectedStreamId}
               onSelect={handleStreamSelect}
+              onComplete={streams.completeStream}
+              onDelete={streams.deleteStream}
               loading={streams.loading}
             />
             {selectedStreamId && (
@@ -134,12 +139,27 @@ export default function App() {
         docViewer={
           <DocViewer
             scope={streamDetail.detail?.scope ?? null}
-            notes={streamDetail.detail?.notes ?? null}
+            dailyNotes={{
+              content: notes.content,
+              loading: notes.loading,
+              date: notes.date,
+              onDateChange: notes.setDate,
+              onSave: notes.save,
+            }}
             ideas={ideas.ideas}
             ideasLoading={ideas.loading}
+            onCreateIdea={ideas.createIdea}
+            onUpdateIdea={ideas.updateIdea}
+            onDeleteIdea={ideas.deleteIdea}
           />
         }
-        chatDrawer={<ChatDrawer />}
+        chatOpen={chatOpen}
+        chatSidebar={
+          <ChatSidebar
+            isOpen={chatOpen}
+            onToggle={() => setChatOpen((prev) => !prev)}
+          />
+        }
       />
     </div>
   );

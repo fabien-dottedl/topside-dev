@@ -11,7 +11,7 @@ interface UseFileWatcherOptions {
 export function useFileWatcher(options: UseFileWatcherOptions) {
   const { onFileChange, onReconnect } = options;
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<number>();
+  const reconnectTimeoutRef = useRef<number | undefined>(undefined);
   const reconnectDelayRef = useRef(2000);
   const wasConnectedRef = useRef(false);
   const [connected, setConnected] = useState(false);

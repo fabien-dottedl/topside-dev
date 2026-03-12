@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import http from "node:http";
 import { setupWebSockets } from "./websocket.js";
@@ -8,6 +9,9 @@ import dayPlanRouter from "./routes/day-plan.js";
 import ideasRouter from "./routes/ideas.js";
 import githubRouter from "./routes/github.js";
 import chatRouter from "./routes/chat.js";
+import configRouter from "./routes/config.js";
+import notesRouter from "./routes/notes.js";
+import { startGitHubPoller } from "./lib/github-poller.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -23,10 +27,14 @@ app.use("/api/day-plan", dayPlanRouter);
 app.use("/api/ideas", ideasRouter);
 app.use("/api/github", githubRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/config", configRouter);
+app.use("/api/notes", notesRouter);
 
 const { broadcastFileChange } = setupWebSockets(server);
 const streamsDir = getStreamsDir();
 createFileWatcher(streamsDir, broadcastFileChange);
+
+startGitHubPoller();
 
 server.listen(PORT, () => {
   console.log(`Topside server running on http://localhost:${PORT}`);

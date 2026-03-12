@@ -5,11 +5,17 @@
 set -euo pipefail
 
 STREAMS_DIR="${STREAMS_DIR:-$HOME/.streams}"
+LOG_FILE="$STREAMS_DIR/hooks.log"
+HOOK_NAME="on-stop"
+log() { echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] $HOOK_NAME: $*" >> "$LOG_FILE"; }
+
 INPUT=$(cat)
 CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 STOP_REASON=$(echo "$INPUT" | jq -r '.stop_reason // "completed"')
 
 [ -z "$CWD" ] && exit 0
+
+log "CWD=$CWD stop_reason=$STOP_REASON"
 
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
@@ -20,6 +26,8 @@ for stream_dir in "$STREAMS_DIR"/active/*/; do
   worktree="${worktree/#\~/$HOME}"
 
   if [ "$CWD" = "$worktree" ] || [[ "$CWD" == "$worktree"/* ]]; then
+    STREAM_ID=$(jq -r '.id // "unknown"' "${stream_dir}stream.json" 2>/dev/null)
+    log "matched stream \"$STREAM_ID\""
     if [ "$STOP_REASON" = "user_input" ]; then
       msg="Claude Code paused — waiting for user input"
       event_type="needs_input"

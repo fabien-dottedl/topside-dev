@@ -5,7 +5,8 @@ interface Props {
   dayPlan: ReactNode;
   githubFeed: ReactNode;
   docViewer: ReactNode;
-  chatDrawer: ReactNode;
+  chatSidebar: ReactNode;
+  chatOpen: boolean;
 }
 
 export function DashboardLayout({
@@ -13,17 +14,24 @@ export function DashboardLayout({
   dayPlan,
   githubFeed,
   docViewer,
-  chatDrawer,
+  chatSidebar,
+  chatOpen,
 }: Props) {
   return (
-    <div className="flex flex-col gap-4 p-4 pb-20">
-      <section>{streamCards}</section>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <section>{dayPlan}</section>
-        <section>{githubFeed}</section>
+    <>
+      <div
+        className={`flex flex-col gap-5 p-4 bg-gray-950 transition-all duration-300 ${
+          chatOpen ? "mr-[400px]" : "mr-10"
+        }`}
+      >
+        <section>{streamCards}</section>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <section>{dayPlan}</section>
+          <section>{githubFeed}</section>
+        </div>
+        <section>{docViewer}</section>
       </div>
-      <section>{docViewer}</section>
-      {chatDrawer}
-    </div>
+      {chatSidebar}
+    </>
   );
 }

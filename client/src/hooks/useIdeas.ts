@@ -17,9 +17,46 @@ export function useIdeas() {
     }
   }, []);
 
+  const createIdea = useCallback(
+    async (data: {
+      title: string;
+      status?: string;
+      priority?: string;
+      content: string;
+    }) => {
+      await api.createIdea(data);
+      fetch();
+    },
+    [fetch],
+  );
+
+  const updateIdea = useCallback(
+    async (
+      id: string,
+      data: {
+        title?: string;
+        status?: string;
+        priority?: string;
+        content?: string;
+      },
+    ) => {
+      await api.updateIdea(id, data);
+      fetch();
+    },
+    [fetch],
+  );
+
+  const deleteIdea = useCallback(
+    async (id: string) => {
+      await api.deleteIdea(id);
+      fetch();
+    },
+    [fetch],
+  );
+
   useEffect(() => {
     fetch();
   }, [fetch]);
 
-  return { ideas, loading, refetch: fetch };
+  return { ideas, loading, refetch: fetch, createIdea, updateIdea, deleteIdea };
 }

@@ -1,7 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
-import { groq } from "@ai-sdk/groq";
+import { anthropic } from "@ai-sdk/anthropic";
 import { delegateToAgent, getCurrentTime } from "./tools/shared.js";
 
 const memory = new Memory({
@@ -33,7 +33,7 @@ Guidelines:
 3. If the request spans multiple domains, delegate to the most relevant agent first.
 4. Always pass along the full context of the user's request when delegating.
 5. Present the specialist's response naturally — don't add unnecessary framing.`,
-  model: groq("llama-4-scout-17b-16e-instruct"),
+  model: anthropic("claude-haiku-4-5-20251001"),
   tools: { delegateToAgent, getCurrentTime },
   memory,
 });
