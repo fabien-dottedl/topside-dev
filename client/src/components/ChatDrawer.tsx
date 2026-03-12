@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { ChatMessage } from "./ChatMessage";
 
 export function ChatDrawer() {
@@ -7,9 +8,13 @@ export function ChatDrawer() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, status } = useChat({
-    api: "/api/chat",
+  const [input, setInput] = useState("");
+
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
+
+  const isLoading = status !== "ready";
 
   // Auto-scroll when messages change
   useEffect(() => {
@@ -24,24 +29,22 @@ export function ChatDrawer() {
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit();
+      if (input.trim() && !isLoading) {
+        sendMessage({ text: input });
+        setInput("");
+      }
     }
     if (e.key === "Escape") {
       setExpanded(false);
     }
   };
 
-  // Extract text from message - useChat v3 uses parts array
+  // Extract text from message - v3 uses parts array
   const getMessageText = (message: typeof messages[number]): string => {
-    if (typeof message.content === "string") return message.content;
-    // For v3 with parts, try to extract text parts
-    if (message.parts) {
-      return message.parts
-        .filter((p: any) => p.type === "text")
-        .map((p: any) => p.text)
-        .join("");
-    }
-    return "";
+    return message.parts
+      .filter((p): p is Extract<typeof p, { type: "text" }> => p.type === "text")
+      .map((p) => p.text)
+      .join("");
   };
 
   return (
@@ -87,12 +90,18 @@ export function ChatDrawer() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="border-t border-gray-800 p-3">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (input.trim() && !isLoading) {
+              sendMessage({ text: input });
+              setInput("");
+            }
+          }} className="border-t border-gray-800 p-3">
             <div className="flex gap-2">
               <textarea
                 ref={inputRef}
                 value={input}
-                onChange={handleInputChange}
+                onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Message Topside..."
                 rows={1}
